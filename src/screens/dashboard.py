@@ -7,4 +7,9 @@ class DashboardScreen(QWidget):
         layout = QVBoxLayout(self)
         label = QLabel("Bienvenido al Dashboard del ERP", self)
         layout.addWidget(label)
+
+        label2 = QLabel("Ultimos Proyectos", self)
+        layout.addWidget(label2)
+
+
         self.setLayout(layout)
