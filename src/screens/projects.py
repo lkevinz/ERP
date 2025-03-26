@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTableWidget, QTableWi
 from PyQt6.QtCore import Qt
 from screens.ConexionSQL import conexionDB, cerrarConexion
 from datetime import datetime, timedelta
-import pymysql  # Asegurarse de importar pymysql en este archivo también
+import pymysql 
 
 class ProjectsScreen(QWidget):
     def __init__(self):
@@ -11,30 +11,28 @@ class ProjectsScreen(QWidget):
         # Layout principal vertical
         main_layout = QVBoxLayout(self)
         
-        # Título del dashboard
-        label = QLabel("Bienvenido al Dashboard del ERP", self)
-        main_layout.addWidget(label)
-
-        # Subtítulo
-        label2 = QLabel("Proyectos", self)
-        main_layout.addWidget(label2)
+         # Título
+        title_label = QLabel("PROJECTS", self)
+        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_label.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 15px;")
+        main_layout.addWidget(title_label)
 
         # Layout superior para los botones (horizontal)
         top_layout = QHBoxLayout()
         main_layout.addLayout(top_layout)
 
         # Botón para ver proyectos de la semana actual
-        filter_week_button = QPushButton("Ver últimos proyectos del ultimo mes", self)
-        filter_week_button.clicked.connect(self.filter_current_month_projects)
-        top_layout.addWidget(filter_week_button)
+        filter_month_button = QPushButton("Ver últimos proyectos del ultimo mes", self)
+        filter_month_button.clicked.connect(self.filter_current_month_projects)
+        top_layout.addWidget(filter_month_button)
 
-        # Botón para ver todos los proyectos
+        # Botón para cargar todos los proyectos
         all_projects_button = QPushButton("Ver todos los proyectos", self)
         all_projects_button.clicked.connect(self.load_table_data)
         top_layout.addWidget(all_projects_button)
 
         # Alinear los botones a la esquina superior derecha
-        top_layout.setAlignment(Qt.AlignmentFlag.AlignRight)
+        top_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
 
         # Tabla de proyectos
         self.table = QTableWidget(self)

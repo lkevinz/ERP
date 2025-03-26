@@ -20,7 +20,7 @@ class FinanceScreen(QWidget):
         main_layout.setSpacing(20)  # Añade espacio entre secciones
 
         # Título
-        title_label = QLabel("FINANZAS", self)
+        title_label = QLabel("FINANCE", self)
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         title_label.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 15px;")
         main_layout.addWidget(title_label)
