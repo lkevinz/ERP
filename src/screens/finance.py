@@ -22,7 +22,7 @@ class FinanceScreen(QWidget):
         title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
         main_layout.addWidget(title_label)
 
-        # Subtítulo
+        # Subtítulo facturas
         label2 = QLabel("Facturas", self)
         main_layout.addWidget(label2)
 
@@ -33,6 +33,11 @@ class FinanceScreen(QWidget):
         top_layout.addWidget(view_month_btn)
         top_layout.setAlignment(Qt.AlignmentFlag.AlignLeft)
         main_layout.addLayout(top_layout)
+
+        # Botón para cargar todas las facturas
+        load_facturas_btn = QPushButton("Cargar datos de facturaspro", self)
+        load_facturas_btn.clicked.connect(self.load_finance_data)
+        main_layout.addWidget(load_facturas_btn)
 
         # Tabla de facturaspro
         self.facturas_table = QTableWidget(0, 18, self)
@@ -46,15 +51,19 @@ class FinanceScreen(QWidget):
         )
         main_layout.addWidget(self.facturas_table)
 
-        # Botón para cargar todas las facturas
-        load_facturas_btn = QPushButton("Cargar datos de facturaspro", self)
-        load_facturas_btn.clicked.connect(self.load_finance_data)
-        main_layout.addWidget(load_facturas_btn)
-
+        
         # Subtítulo Albaranes
         label3 = QLabel("Albaranes", self)
         main_layout.addWidget(label3)
         
+        # Botón para cargar los datos de albaranespro
+        load_albaranes_btn = QPushButton("Cargar datos de albaranespro", self)
+        load_albaranes_btn.clicked.connect(self.load_albaranes_data)
+        main_layout.addWidget(load_albaranes_btn)
+
+        main_layout.addStretch()
+        self.setLayout(main_layout)
+
         # Tabla de albaranespro
         self.albaranes_table = QTableWidget(0, 17, self)
         self.albaranes_table.setHorizontalHeaderLabels(
@@ -67,13 +76,28 @@ class FinanceScreen(QWidget):
         )
         main_layout.addWidget(self.albaranes_table)
 
-        # Botón para cargar los datos de albaranespro
-        load_albaranes_btn = QPushButton("Cargar datos de albaranespro", self)
-        load_albaranes_btn.clicked.connect(self.load_albaranes_data)
-        main_layout.addWidget(load_albaranes_btn)
+        # Subtítulo ingresos
+        label_ingresos = QLabel("Ingresos", self)
+        main_layout.addWidget(label_ingresos)
+        
+        # Botón para cargar datos de ingresos
+        load_ingresos_btn = QPushButton("Cargar datos de ingresos", self)
+        load_ingresos_btn.clicked.connect(self.load_ingresos_data)
+        main_layout.addWidget(load_ingresos_btn)
 
-        main_layout.addStretch()
-        self.setLayout(main_layout)
+        # Tabla de ingresos
+        self.ingresos_table = QTableWidget(0, 22, self)
+        self.ingresos_table.setHorizontalHeaderLabels(
+            [
+                "IdFactura", "IdCliente", "NFactura", "FechaFactura", "FechaCobrada",
+                "TotalTotal", "CertificacionAnterior", "Subtotal", "IVA", "Base1",
+                "Base2", "IVA1", "IVA2", "TipoIVA1", "TipoIVA2", "Total", "IdProyecto",
+                "IdFormaDePago", "Vencimientos", "Direccion", "Localidad", "DireccionTelefono"
+            ]
+        )
+        main_layout.addWidget(self.ingresos_table)
+        
+
 
     def load_finance_data(self):
         """Carga todos los datos desde la tabla facturaspro."""
@@ -149,3 +173,32 @@ class FinanceScreen(QWidget):
             print(f"Error al cargar las facturas de este mes: {e}")
         finally:
             cerrarConexion(conexion)
+    
+    def load_ingresos_data(self):
+        """Carga todos los datos desde la tabla ingresos."""
+        self.ingresos_table.setRowCount(0)
+        conexion, cursor = conexionDB()
+        if not conexion:
+            return
+
+        try:
+            query = """
+            SELECT IdFactura, IdCliente, NFactura, FechaFactura, FechaCobrada,
+            TotalTotal, CertificacionAnterior, Subtotal, IVA, Base1, Base2,
+            IVA1, IVA2, TipoIVA1, TipoIVA2, Total, IdProyecto, IdFormaDePago,
+            Vencimientos, Direccion, Localidad, DireccionTelefono 
+            FROM facturas
+            """
+            cursor.execute(query)
+            results = cursor.fetchall()
+
+            for row_data in results:
+                row = self.ingresos_table.rowCount()
+                self.ingresos_table.insertRow(row)
+                for col, value in enumerate(row_data):
+                    self.ingresos_table.setItem(row, col, QTableWidgetItem(str(value)))
+        except Exception as e:
+            print(f"Error al cargar los datos de ingresos: {e}")
+        finally:
+            cerrarConexion(conexion)
+        
