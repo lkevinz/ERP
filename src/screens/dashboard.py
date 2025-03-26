@@ -24,8 +24,8 @@ class DashboardScreen(QWidget):
         main_layout.addLayout(top_layout)
 
         # Botón para ver proyectos de la semana actual
-        filter_week_button = QPushButton("Ver últimos proyectos de la semana", self)
-        filter_week_button.clicked.connect(self.filter_week_projects)
+        filter_week_button = QPushButton("Ver últimos proyectos del ultimo mes", self)
+        filter_week_button.clicked.connect(self.filter_current_month_projects)
         top_layout.addWidget(filter_week_button)
 
         # Botón para ver todos los proyectos
@@ -77,13 +77,16 @@ class DashboardScreen(QWidget):
         finally:
             cerrarConexion(miConexion)
 
-    def filter_week_projects(self):
-        """Filtra y muestra los proyectos de la semana actual."""
+    # Filtra y muestra los proyectos del mes actual
+    def filter_current_month_projects(self):
         today = datetime.now()
-        start_of_week = today - timedelta(days=today.weekday())  # Lunes de la semana
+        current_year = today.year
+        current_month = today.month
+    
         query = f"""
-            SELECT IdProyecto, NProyecto, NombreObra, Direccion, Localidad, Telefono1, Email, Fecha, IdCliente
+            SELECT IdProyecto, NProyecto, NombreObra, Direccion, Localidad, 
+               Telefono1, Email, Fecha, IdCliente
             FROM proyectos
-            WHERE Fecha >= '{start_of_week.strftime('%Y-%m-%d')}'
-        """
+            WHERE YEAR(Fecha) = {current_year} AND MONTH(Fecha) = {current_month}
+            """
         self.load_table_data(filter_query=query)
