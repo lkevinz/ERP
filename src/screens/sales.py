@@ -7,7 +7,8 @@ from PyQt6.QtWidgets import (
     QTableWidgetItem,
     QPushButton,
     QSpacerItem,
-    QSizePolicy
+    QSizePolicy,
+    QGroupBox
 )
 from PyQt6.QtCore import Qt
 from screens.ConexionSQL import conexionDB, cerrarConexion
@@ -32,46 +33,77 @@ class SalesScreen(QWidget):
 
         main_layout.addLayout(title_layout)
 
-        # --- SECCIÓN DE CLIENTES ---
+        # --- SECCIÓN DE TABLAS (CLIENTES Y PROVEEDORES) ---
+        tables_layout = QHBoxLayout()
+        tables_layout.setSpacing(20)
+
+        # --- GRUPO DE CLIENTES ---
+        clientes_group = QGroupBox("CLIENTES")
+        clientes_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 16px; }")
         clientes_group_layout = QVBoxLayout()
         clientes_group_layout.setSpacing(10)
 
-        # Subtítulo "CLIENTES"
-        clientes_label = QLabel("CLIENTES", self)
-        clientes_label.setAlignment(Qt.AlignmentFlag.AlignLeft)
-        clientes_label.setStyleSheet("""
-            font-weight: bold; 
-            font-size: 16px;
-            padding: 5px;
-            border-bottom: 2px solid #ccc;
-        """)
-        clientes_group_layout.addWidget(clientes_label)
-
-        # Layout para botón y espacio
+        # Layout para botón de carga
         clientes_toolbar = QHBoxLayout()
         
         # Botón de carga
-        self.load_btn = QPushButton("Cargar Datos de Clientes", self)
-        self.load_btn.clicked.connect(self.load_clientes)
-        self.load_btn.setFixedWidth(200)
-        clientes_toolbar.addWidget(self.load_btn)
+        self.load_clientes_btn = QPushButton("Cargar Clientes", self)
+        self.load_clientes_btn.clicked.connect(self.load_clientes)
+        self.load_clientes_btn.setFixedWidth(200)
+        clientes_toolbar.addWidget(self.load_clientes_btn)
         
-        # Espaciador para empujar todo a la izquierda
+        # Espaciador
         clientes_toolbar.addStretch()
         
         clientes_group_layout.addLayout(clientes_toolbar)
 
         # Tabla de clientes
-        self.table = QTableWidget(0, 14, self)
-        self.table.setHorizontalHeaderLabels(
+        self.clientes_table = QTableWidget(0, 14, self)
+        self.clientes_table.setHorizontalHeaderLabels(
             ["IdCliente", "NCliente", "Nombre", "Apellidos", "DNI", "Contacto", 
              "Dirección", "Localidad", "Provincia", "Código Postal", 
              "Teléfono", "Email", "Forma de Pago", "Firma Digital"]
         )
-        self.table.horizontalHeader().setStretchLastSection(True)
-        clientes_group_layout.addWidget(self.table)
+        self.clientes_table.horizontalHeader().setStretchLastSection(True)
+        clientes_group_layout.addWidget(self.clientes_table)
+        
+        clientes_group.setLayout(clientes_group_layout)
+        tables_layout.addWidget(clientes_group)
 
-        main_layout.addLayout(clientes_group_layout)
+        # --- GRUPO DE PROVEEDORES ---
+        proveedores_group = QGroupBox("PROVEEDORES")
+        proveedores_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 16px; }")
+        proveedores_group_layout = QVBoxLayout()
+        proveedores_group_layout.setSpacing(10)
+
+        # Layout para botón de carga
+        proveedores_toolbar = QHBoxLayout()
+        
+        # Botón de carga
+        self.load_proveedores_btn = QPushButton("Cargar Proveedores", self)
+        self.load_proveedores_btn.clicked.connect(self.load_proveedores)
+        self.load_proveedores_btn.setFixedWidth(200)
+        proveedores_toolbar.addWidget(self.load_proveedores_btn)
+        
+        # Espaciador
+        proveedores_toolbar.addStretch()
+        
+        proveedores_group_layout.addLayout(proveedores_toolbar)
+
+        # Tabla de proveedores
+        self.proveedores_table = QTableWidget(0, 11, self)
+        self.proveedores_table.setHorizontalHeaderLabels(
+            ["IdProveedor", "NProveedor", "FechaAlta", "Proveedor", "CIF", 
+             "Contacto", "Dirección", "Localidad", "Código Postal", 
+             "Provincia", "Teléfono", "Email"]
+        )
+        self.proveedores_table.horizontalHeader().setStretchLastSection(True)
+        proveedores_group_layout.addWidget(self.proveedores_table)
+        
+        proveedores_group.setLayout(proveedores_group_layout)
+        tables_layout.addWidget(proveedores_group)
+
+        main_layout.addLayout(tables_layout)
 
     def load_clientes(self):
         # Establecer conexión y obtener conexión y cursor
@@ -93,16 +125,54 @@ class SalesScreen(QWidget):
             resultados = cursor.fetchall()
             
             # Limpiar la tabla antes de cargar nuevos datos
-            self.table.setRowCount(0)
+            self.clientes_table.setRowCount(0)
             
             # Configurar el número de filas según los resultados
-            self.table.setRowCount(len(resultados))
+            self.clientes_table.setRowCount(len(resultados))
             
             # Llenar la tabla con los datos
             for row_idx, row_data in enumerate(resultados):
                 for col_idx, col_data in enumerate(row_data):
                     item = QTableWidgetItem(str(col_data) if col_data is not None else "")
-                    self.table.setItem(row_idx, col_idx, item)
+                    self.clientes_table.setItem(row_idx, col_idx, item)
+                    
+        except pymysql.Error as e:
+            print(f"Error al ejecutar la consulta: {e}")
+        finally:
+            # Cerrar la conexión
+            if conexion:
+                cerrarConexion(conexion)
+
+    def load_proveedores(self):
+        # Establecer conexión y obtener conexión y cursor
+        conexion, cursor = conexionDB()
+        
+        if not conexion or not cursor:
+            print("Error al conectar a la base de datos")
+            return
+            
+        try:
+            # Consulta SQL para obtener los datos de proveedores
+            sql = """
+            SELECT IdProveedor, NProveedor, FechaAlta, Proveedor, CIF, 
+                   Contacto, Direccion, Localidad, CodigoPostal, 
+                   Provincia, Telefono, Email
+            FROM proveedores
+            """
+            cursor.execute(sql)
+            resultados = cursor.fetchall()
+            
+            # Limpiar la tabla antes de cargar nuevos datos
+            self.proveedores_table.setRowCount(0)
+            
+            # Configurar el número de filas según los resultados
+            self.proveedores_table.setRowCount(len(resultados))
+            
+            # Llenar la tabla con los datos
+            for row_idx, row_data in enumerate(resultados):
+                for col_idx, col_data in enumerate(row_data):
+                    item = QTableWidgetItem(str(col_data) if col_data is not None else "")
+                    self.proveedores_table.setItem(row_idx, col_idx, item)
                     
         except pymysql.Error as e:
             print(f"Error al ejecutar la consulta: {e}")

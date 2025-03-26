@@ -7,7 +7,8 @@ from PyQt6.QtWidgets import (
     QPushButton,
     QHBoxLayout,
     QSpacerItem,
-    QSizePolicy
+    QSizePolicy,
+    QGroupBox
 )
 from PyQt6.QtCore import Qt
 from screens.ConexionSQL import conexionDB, cerrarConexion
@@ -18,6 +19,7 @@ class FinanceScreen(QWidget):
         super().__init__()
         main_layout = QVBoxLayout(self)
         main_layout.setSpacing(20)  # Añade espacio entre secciones
+        main_layout.setContentsMargins(10, 10, 10, 10)
 
         # Título
         title_label = QLabel("FINANCE", self)
@@ -26,22 +28,20 @@ class FinanceScreen(QWidget):
         main_layout.addWidget(title_label)
 
         # --- SECCIÓN FACTURAS ---
+        facturas_group = QGroupBox("FACTURAS")
+        facturas_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 16px; }")
         facturas_layout = QVBoxLayout()
         
-        # Subtítulo facturas
-        label_facturas = QLabel("FACTURAS", self)
-        label_facturas.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        label_facturas.setStyleSheet("font-weight: bold; font-size: 16px;")
-        facturas_layout.addWidget(label_facturas)
-
         # Botones de facturas
         buttons_facturas_layout = QHBoxLayout()
         view_month_btn = QPushButton("Facturas de este mes", self)
         view_month_btn.clicked.connect(self.load_month_facturas)
+        view_month_btn.setFixedWidth(200)
         buttons_facturas_layout.addWidget(view_month_btn)
         
-        load_facturas_btn = QPushButton("Cargar datos de facturaspro", self)
+        load_facturas_btn = QPushButton("Cargar todas las facturas", self)
         load_facturas_btn.clicked.connect(self.load_facturas)
+        load_facturas_btn.setFixedWidth(200)
         buttons_facturas_layout.addWidget(load_facturas_btn)
         
         buttons_facturas_layout.addStretch()  # Empuja los botones a la izquierda
@@ -57,24 +57,23 @@ class FinanceScreen(QWidget):
                 "IdFormaDePago", "IdCuenta1"
             ]
         )
+        self.facturas_table.horizontalHeader().setStretchLastSection(True)
         self.facturas_table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         facturas_layout.addWidget(self.facturas_table)
         
-        main_layout.addLayout(facturas_layout)
+        facturas_group.setLayout(facturas_layout)
+        main_layout.addWidget(facturas_group)
 
         # --- SECCIÓN ALBARANES ---
+        albaranes_group = QGroupBox("ALBARANES")
+        albaranes_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 16px; }")
         albaranes_layout = QVBoxLayout()
-        
-        # Subtítulo Albaranes
-        label_albaranes = QLabel("ALBARANES", self)
-        label_albaranes.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        label_albaranes.setStyleSheet("font-weight: bold; font-size: 16px;")
-        albaranes_layout.addWidget(label_albaranes)
         
         # Botón para cargar los datos de albaranespro
         buttons_albaranes_layout = QHBoxLayout()
-        load_albaranes_btn = QPushButton("Cargar datos de albaranespro", self)
+        load_albaranes_btn = QPushButton("Cargar albaranes", self)
         load_albaranes_btn.clicked.connect(self.load_albaranes)
+        load_albaranes_btn.setFixedWidth(200)
         buttons_albaranes_layout.addWidget(load_albaranes_btn)
         buttons_albaranes_layout.addStretch()  # Empuja el botón a la izquierda
         albaranes_layout.addLayout(buttons_albaranes_layout)
@@ -89,24 +88,23 @@ class FinanceScreen(QWidget):
                 "RutaArchivo", "IdFacturaPro"
             ]
         )
+        self.albaranes_table.horizontalHeader().setStretchLastSection(True)
         self.albaranes_table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         albaranes_layout.addWidget(self.albaranes_table)
         
-        main_layout.addLayout(albaranes_layout)
+        albaranes_group.setLayout(albaranes_layout)
+        main_layout.addWidget(albaranes_group)
 
         # --- SECCIÓN INGRESOS ---
+        ingresos_group = QGroupBox("INGRESOS")
+        ingresos_group.setStyleSheet("QGroupBox { font-weight: bold; font-size: 16px; }")
         ingresos_layout = QVBoxLayout()
-        
-        # Subtítulo ingresos
-        label_ingresos = QLabel("INGRESOS", self)
-        label_ingresos.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        label_ingresos.setStyleSheet("font-weight: bold; font-size: 16px;")
-        ingresos_layout.addWidget(label_ingresos)
         
         # Botón para cargar datos de ingresos
         buttons_ingresos_layout = QHBoxLayout()
-        load_ingresos_btn = QPushButton("Cargar datos de ingresos", self)
+        load_ingresos_btn = QPushButton("Cargar ingresos", self)
         load_ingresos_btn.clicked.connect(self.load_ingresos)
+        load_ingresos_btn.setFixedWidth(200)
         buttons_ingresos_layout.addWidget(load_ingresos_btn)
         buttons_ingresos_layout.addStretch()  # Empuja el botón a la izquierda
         ingresos_layout.addLayout(buttons_ingresos_layout)
@@ -121,16 +119,17 @@ class FinanceScreen(QWidget):
                 "IdFormaDePago", "Vencimientos", "Direccion", "Localidad", "DireccionTelefono"
             ]
         )
+        self.ingresos_table.horizontalHeader().setStretchLastSection(True)
         self.ingresos_table.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding)
         ingresos_layout.addWidget(self.ingresos_table)
         
-        main_layout.addLayout(ingresos_layout)
+        ingresos_group.setLayout(ingresos_layout)
+        main_layout.addWidget(ingresos_group)
         
         # Añadir espacio al final para evitar que todo quede pegado abajo
         main_layout.addStretch()
 
-
-                                # MÉTODOS DE CARGA
+    # MÉTODOS DE CARGA (se mantienen igual que en tu código original)
     def load_month_facturas(self):
         """Carga las facturas del mes actual ordenadas por fecha."""
         self.facturas_table.setRowCount(0)
@@ -172,7 +171,6 @@ class FinanceScreen(QWidget):
             cursor.execute(query)
             results = cursor.fetchall()
 
-
             for row_data in results:
                 row = self.facturas_table.rowCount()
                 self.facturas_table.insertRow(row)
@@ -206,7 +204,6 @@ class FinanceScreen(QWidget):
         finally:
             cerrarConexion(conexion)
 
-    
     def load_ingresos(self):
         """Carga todos los datos desde la tabla ingresos."""
         self.ingresos_table.setRowCount(0)
@@ -233,5 +230,4 @@ class FinanceScreen(QWidget):
         except Exception as e:
             print(f"Error al cargar los datos de ingresos: {e}")
         finally:
-            cerrarConexion(conexion)
-        
+            cerrarConexion(conexion)      
