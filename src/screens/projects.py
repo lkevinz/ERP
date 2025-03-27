@@ -1,20 +1,31 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QTableWidget, QTableWidgetItem, QPushButton, QHBoxLayout
+from PyQt6.QtWidgets import (
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QTableWidget,
+    QTableWidgetItem,
+    QPushButton,
+    QHBoxLayout,
+)
 from PyQt6.QtCore import Qt
-from screens.ConexionSQL import conexionDB, cerrarConexion
+from database.ConexionSQL import conexionDB, cerrarConexion
 from datetime import datetime, timedelta
-import pymysql 
+import pymysql
+
 
 class ProjectsScreen(QWidget):
     def __init__(self):
         super().__init__()
-        
+
         # Layout principal vertical
         main_layout = QVBoxLayout(self)
-        
-         # Título
+
+        # Título
         title_label = QLabel("PROJECTS", self)
         title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        title_label.setStyleSheet("font-size: 24px; font-weight: bold; margin-bottom: 15px;")
+        title_label.setStyleSheet(
+            "font-size: 24px; font-weight: bold; margin-bottom: 15px;"
+        )
         main_layout.addWidget(title_label)
 
         # Layout superior para los botones (horizontal)
@@ -53,17 +64,30 @@ class ProjectsScreen(QWidget):
                 return
 
             # Ejecutar consulta con o sin filtro
-            query = filter_query if filter_query else "SELECT IdProyecto, NProyecto, NombreObra, Direccion, Localidad, Telefono1, Email, Fecha, IdCliente FROM proyectos"
+            query = (
+                filter_query
+                if filter_query
+                else "SELECT IdProyecto, NProyecto, NombreObra, Direccion, Localidad, Telefono1, Email, Fecha, IdCliente FROM proyectos"
+            )
             cursor.execute(query)
             rows = cursor.fetchall()
 
             # Configurar número de filas y columnas
             self.table.setRowCount(len(rows))
             self.table.setColumnCount(9)
-            self.table.setHorizontalHeaderLabels([
-                "IdProyecto", "NProyecto", "NombreObra", "Direccion",
-                "Localidad", "Telefono1", "Email", "Fecha", "IdCliente"
-            ])
+            self.table.setHorizontalHeaderLabels(
+                [
+                    "IdProyecto",
+                    "NProyecto",
+                    "NombreObra",
+                    "Direccion",
+                    "Localidad",
+                    "Telefono1",
+                    "Email",
+                    "Fecha",
+                    "IdCliente",
+                ]
+            )
 
             # Llenar la tabla con los datos
             for row_idx, row in enumerate(rows):
@@ -80,7 +104,7 @@ class ProjectsScreen(QWidget):
         today = datetime.now()
         current_year = today.year
         current_month = today.month
-    
+
         query = f"""
             SELECT IdProyecto, NProyecto, NombreObra, Direccion, Localidad, 
                Telefono1, Email, Fecha, IdCliente
