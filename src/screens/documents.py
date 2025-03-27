@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
 )
 from PyQt6.QtCore import Qt
-from database.ConexionSQL import conexionDB, cerrarConexion
+from database.connectionSQL import conexionDB, cerrarConexion
 from datetime import datetime, timedelta
 import pymysql
 
@@ -102,13 +102,13 @@ class DocumentsScreen(QWidget):
         except pymysql.Error as e:
             print(f"Error al cargar los datos: {e}")
         finally:
-            if 'miConexion' in locals():
+            if "miConexion" in locals():
                 cerrarConexion(miConexion)
 
     def filter_recent_documents(self):
         """Filtra y muestra los documentos de los últimos 30 días"""
         thirty_days_ago = datetime.now() - timedelta(days=30)
-        date_str = thirty_days_ago.strftime('%Y-%m-%d')
+        date_str = thirty_days_ago.strftime("%Y-%m-%d")
 
         query = f"""
             SELECT IdDocumento, Id, Tipo, Ruta, Titulo, IdCarpeta, 

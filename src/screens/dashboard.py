@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QHBoxLayout,
 )
 from PyQt6.QtCore import Qt
-from database.ConexionSQL import cerrarConexion
+from database.connectionSQL import cerrarConexion
 from datetime import datetime, timedelta
 import pymysql  # Asegurarse de importar pymysql en este archivo también
 
