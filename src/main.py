@@ -28,7 +28,10 @@ from screens.documents import DocumentsScreen
 from reports.rentabilidad_informe import generar_informe_rentabilidad
 
 # Importa funciones de modelo (opcional)
-from analysis.rentabilidad_model import entrenar_modelo, predecir_rentabilidad
+from analysis.rentabilidad_model import (
+    entrenar_modelo_neuronal,
+    predecir_rentabilidad_neuronal,
+)
 
 
 class MainWindow(QMainWindow):
@@ -133,21 +136,15 @@ class MainWindow(QMainWindow):
             )
 
     def on_ia_btn_clicked(self):
-        """
-        Ejemplo de cómo podrías entrenar o predecir con un modelo de IA.
-        """
         try:
-            # Entrenamiento del modelo (ejemplo)
-            modelo, score = entrenar_modelo()
+            model, scaler, losses = entrenar_modelo_neuronal(
+                epochs=50, batch_size=32, learning_rate=0.001
+            )
             QMessageBox.information(
-                self, "Entrenamiento IA", f"Modelo entrenado. Score: {score:.2f}"
+                self, "Entrenamiento IA", "Modelo neuronal entrenado con éxito."
             )
-            # Opcional: predecir rentabilidad de nuevos proyectos
-            # df_pred = predecir_rentabilidad(modelo, df_nuevos_proyectos)
         except Exception as e:
-            QMessageBox.critical(
-                self, "Error IA", f"Ocurrió un error en el modelo IA:\n{str(e)}"
-            )
+            QMessageBox.critical(self, "Error IA", f"Ocurrió un error:\n{str(e)}")
 
 
 def main():
