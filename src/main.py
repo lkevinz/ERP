@@ -1,4 +1,5 @@
 import sys
+import os
 from PyQt6.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -11,9 +12,8 @@ from PyQt6.QtWidgets import (
     QMessageBox,
 )
 from PyQt6.QtGui import QIcon
-import os
 
-# Ejemplo de pantallas existentes
+# Pantallas existentes
 from screens.dashboard import DashboardScreen
 from screens.sales import SalesScreen
 from screens.inventory import InventoryScreen
@@ -24,14 +24,20 @@ from screens.projects import ProjectsScreen
 from screens.purchasing import PurchasingScreen
 from screens.documents import DocumentsScreen
 
-# Importa la función para generar el informe
+# Función para generar el informe
 from reports.rentabilidad_informe import generar_informe_rentabilidad
 
-# Importa funciones de modelo (opcional)
+# Funciones de modelo (opcional)
 from analysis.rentabilidad_model import (
     entrenar_modelo_neuronal,
     predecir_rentabilidad_neuronal,
 )
+
+
+def resource_path(relative_path: str) -> str:
+    # Si sys._MEIPASS existe, úsalo. Si no, usa la carpeta actual.
+    base_path = getattr(sys, "_MEIPASS", os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
 
 
 class MainWindow(QMainWindow):
@@ -39,10 +45,11 @@ class MainWindow(QMainWindow):
         super().__init__()
         self.setWindowTitle("ERP - Integrated System (PyQt6)")
         self.setGeometry(50, 50, 1400, 900)
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        icon_path = os.path.join(current_dir, "icon", "icon_erp.ico")
-        if os.path.exists(icon_path):
-            self.setWindowIcon(QIcon(icon_path))
+
+        # Establecemos el ícono de la ventana
+        icon_path = resource_path(os.path.join("icon", "icon_erp.ico"))
+        self.setWindowIcon(QIcon(icon_path))
+
         self.setup_ui()
 
     def setup_ui(self):
@@ -149,6 +156,9 @@ class MainWindow(QMainWindow):
 
 def main():
     app = QApplication(sys.argv)
+    # Icono global para la barra de tareas
+    app.setWindowIcon(QIcon(resource_path("icon/icon_erp.ico")))
+
     window = MainWindow()
     window.show()
     sys.exit(app.exec())
